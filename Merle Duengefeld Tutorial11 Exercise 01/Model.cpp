@@ -26,6 +26,7 @@ Model::Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 int Model::LoadObjModel(char* filename)
 {
 	m_pObject = new ObjFileModel(filename, m_pD3DDevice, m_pImmediateContext);
+	AddTexture("assets/tex.jpg");
 
 	if (m_pObject->filename == "FILE NOT LOADED")
 		return S_FALSE;
@@ -116,20 +117,19 @@ void Model::Draw(XMMATRIX* view, XMMATRIX* projection)
 	{
 
 
-	m_pImmediateContext->UpdateSubresource(m_pConstantBuffer, 0, 0, &model_cb_values, 0, 0);
-	m_pImmediateContext->VSSetConstantBuffers(0, 1, &m_pConstantBuffer);
+		m_pImmediateContext->UpdateSubresource(m_pConstantBuffer, 0, 0, &model_cb_values, 0, 0);
+		m_pImmediateContext->VSSetConstantBuffers(0, 1, &m_pConstantBuffer);
 
-	m_pImmediateContext->VSSetShader(m_pVShader, 0, 0);
-	m_pImmediateContext->PSSetShader(m_pPShader, 0, 0);
+		m_pImmediateContext->VSSetShader(m_pVShader, 0, 0);
+		m_pImmediateContext->PSSetShader(m_pPShader, 0, 0);
 
-	m_pImmediateContext->IASetInputLayout(m_pInputLayout);
+		m_pImmediateContext->IASetInputLayout(m_pInputLayout);
 
-	m_pImmediateContext->PSSetSamplers(0, 1, &g_pSampler0);
-	m_pImmediateContext->PSSetShaderResources(0, 1, &g_pTexture0);
+		m_pImmediateContext->PSSetSamplers(0, 1, &g_pSampler0);
+		m_pImmediateContext->PSSetShaderResources(0, 1, &g_pTexture0);
 
-	AddTexture("assets/tex.jpg");
 
-	m_pObject->Draw();
+		m_pObject->Draw();
 	}
 }
 void Model::AddTexture(char * filename)
@@ -145,6 +145,7 @@ void Model::AddTexture(char * filename)
 	sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	m_pD3DDevice->CreateSamplerState(&sampler_desc, &g_pSampler0);
+
 }
 void Model::LookAt_XZ(float x, float z)
 {
@@ -154,12 +155,12 @@ void Model::LookAt_XZ(float x, float z)
 	dx = sin(x * (XM_PI / 180));
 	dz = cos(z * (XM_PI / 180));
 
-	m_yangle = atan2(dx, dz) * (180.0 / XM_PI);
+	m_yangle = atan2(dx, dz) * (180.0f / XM_PI);
 }
 void Model::MoveForward(float distance)
 {
-	m_x += sin(m_yangle * (XM_PI / 180.0)) * distance;
-	m_z += cos(m_yangle * (XM_PI / 180.0)) * distance;
+	m_x += sin(m_yangle * (XM_PI / 180.0f)) * distance;
+	m_z += cos(m_yangle * (XM_PI / 180.0f)) * distance;
 
 }
 float Model::GetXPos()
@@ -229,4 +230,7 @@ Model::~Model()
 	if (g_pSampler0) g_pSampler0->Release();
 
 	delete m_pObject;
+	/*ID3D11Debug* debug;
+	HRESULT hr = m_pD3DDevice->QueryInterface(IID_PPV_ARGS(&debug));
+	debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);*/
 }
