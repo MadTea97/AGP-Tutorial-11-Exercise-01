@@ -76,7 +76,7 @@ int Model::LoadObjModel(char* filename)
 		return hr;
 	}
 
-	//create constant buffer size 64
+	//create constant buffer size 112
 	D3D11_BUFFER_DESC constant_buffer_desc;
 	ZeroMemory(&constant_buffer_desc, sizeof(constant_buffer_desc));
 
@@ -87,7 +87,6 @@ int Model::LoadObjModel(char* filename)
 	hr = m_pD3DDevice->CreateBuffer(&constant_buffer_desc, NULL, &m_pConstantBuffer);
 
 	if (FAILED(hr)) return hr;
-
 
 }
 void Model::Draw(XMMATRIX* view, XMMATRIX* projection)
@@ -149,13 +148,8 @@ void Model::AddTexture(char * filename)
 }
 void Model::LookAt_XZ(float x, float z)
 {
-	float dx;
-	float dz;
 
-	dx = sin(x * (XM_PI / 180));
-	dz = cos(z * (XM_PI / 180));
-
-	m_yangle = atan2(dx, dz) * (180.0f / XM_PI);
+	m_yangle = atan2((x - m_x), (z-m_z)) * (180.0f / XM_PI);
 }
 void Model::MoveForward(float distance)
 {

@@ -191,9 +191,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (wParam == 0x46)
 			degrees--;
 		if (wParam == 0x52)
-			g_pCamera->Rotate(20.2f);
+			g_pCamera->Rotate(.2f);
 		if (wParam == 0x47)
-			g_pCamera->Rotate(-20.2f);
+			g_pCamera->Rotate(-.2f);
 		if (wParam == 0x57)
 			g_pCamera->Forward(.2f);
 		if (wParam == 0x53)
@@ -371,16 +371,13 @@ HRESULT InitialiseGraphics()
 	g_pModel = new Model(g_pD3DDevice, g_pImmediateContext);
 	g_pModel->LoadObjModel("assets/cube.obj");
 
-	g_pCamera = new Camera(0.0,0.0,-10.0,0.0);
+	g_pCamera = new Camera(0.0f,0.0f,-10.0f,0.0f);
 
 	return S_OK;
 
 }
-
-// Render frame
 void RenderFrame(void)
 {
-	// Clear the back buffer - choose a colour you like
 	float rgba_clear_colour[4] = { 0.1f, 0.2f, 0.6f, 1.0f };
 	g_pImmediateContext->ClearRenderTargetView(g_pBackBufferRTView, rgba_clear_colour);
 	g_pImmediateContext->ClearDepthStencilView(g_pZBuffer, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -388,24 +385,20 @@ void RenderFrame(void)
 	XMMATRIX projection, view;
 	
 	projection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0), 640.0 / 480.0, 1.0, 100.0);
-
 	view = g_pCamera->GetViewMatrix();
 
-	g_pModel->SetScale(2.0f);
+	g_pModel->SetScale(.5f);
 	g_pModel->LookAt_XZ(g_pCamera->GetX(), g_pCamera->GetZ());
-	//g_pModel->MoveForward(.02f);
+	g_pModel->MoveForward(.002f);
 
 	////select which primitive type to use //03 - 01
 	g_pImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//Draw the vertex buffer to the back buffer //03-01
 	g_pModel->Draw(&view, &projection);
 
 	//text tutorial 08 02
 	g_2DText->AddText("some text", -1.0,+1.0,.2);
 	g_2DText->RenderText();
 
-	// RENDER HERE
-	// Display what has just been rendered
 	g_pSwapChain->Present(0, 0);
 }
